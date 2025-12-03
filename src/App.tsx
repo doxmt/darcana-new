@@ -1,14 +1,20 @@
-import { useState } from "react";
-import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/layout/Layout";
+import Home from "./pages/Home";
+import DailyTarot from "./pages/DailyTarot";
+import ThemeTarot from "./pages/ThemeTarot.tsx";
+import Interpret from "./pages/Interpret";
 
-function App() {
+export default function App() {
   return (
-    <>
-      <h1 className="text-red-500 text-3xl font-bold underline">
-        Hello world!
-      </h1>
-    </>
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route index element={<Home />} />
+
+        <Route path="daily" element={<DailyTarot />} />
+        <Route path="theme" element={<ThemeTarot />} />
+        <Route path="interpret" element={<Interpret />} />
+      </Route>
+    </Routes>
   );
 }
-
-export default App;
