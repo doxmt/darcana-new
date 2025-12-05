@@ -1,8 +1,12 @@
 import { useEffect, useRef } from "react";
 import "./Intro.css";
-import img1 from "../assets/cards/minor/22.png";
+import Button from "./Button";
+import SpeechBubble from "./SpeechBubble";
+import { getTarotgirlImage } from "../util/get-tarotgirl-image";
+import { useNavigate } from "react-router-dom";
 
 export default function IntroSnow() {
+  const nav = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,8 +41,16 @@ export default function IntroSnow() {
 
   return (
     <div className="IntroSnow" ref={containerRef}>
-      <div>
-        <img src={img1} alt="" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30vw] h-[20vh]">
+        <SpeechBubble text="카드를 뽑고 오늘의 운세를 확인해 보세요 ✨">
+          <Button onClick={() => nav("/daily")} text="카드 뽑으러 가기" />
+        </SpeechBubble>
+      </div>
+      <div className="absolute bottom-0 right-0">
+        <img
+          src={getTarotgirlImage(0)}
+          className="w-[40vw] h-auto translate-x-15"
+        />
       </div>
     </div>
   );
