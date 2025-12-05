@@ -1,6 +1,5 @@
-import IntroSnow from "../components/IntroSnow";
-import Intro from "../components/IntroSnow";
+import Intro from "../components/Intro";
 
 export default function Home() {
-  return <IntroSnow />;
+  return <Intro />;
 }

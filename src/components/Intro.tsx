@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
-import "./IntroSnow.css";
+import "./Intro.css";
+import img1 from "../assets/cards/minor/22.png";
 
 export default function IntroSnow() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -34,5 +35,11 @@ export default function IntroSnow() {
     };
   }, []);
 
-  return <div className="IntroSnow" ref={containerRef}></div>;
+  return (
+    <div className="IntroSnow" ref={containerRef}>
+      <div>
+        <img src={img1} alt="" />
+      </div>
+    </div>
+  );
 }
