@@ -1,0 +1,96 @@
+.card {
+  position: relative;
+  width: 216px;
+  height: 384px;
+  border-radius: 8px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* reveal animation */
+.card.revealed .card_img {
+  position: absolute;
+  animation: revealScan 3s ease forwards;
+  opacity: 0;
+}
+
+/* 빛 스캔 효과 */
+.card.revealed::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.7),
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  animation: lightSweep 3s ease forwards;
+  pointer-events: none;
+}
+
+/* 별 반짝임 */
+.card.revealed::before {
+  content: "";
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(
+        circle,
+        rgba(255, 255, 255, 0.8) 0%,
+        transparent 60%
+      )
+      20% 30% / 6px 6px,
+    radial-gradient(circle, rgba(200, 180, 255, 0.7) 0%, transparent 60%) 80%
+      40% / 8px 8px,
+    radial-gradient(circle, rgba(255, 215, 150, 0.9) 0%, transparent 70%) 60%
+      80% / 5px 5px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%) 40%
+      70% / 7px 7px;
+  background-repeat: no-repeat;
+  animation: twinkle 2s infinite ease-in-out;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* keyframes */
+@keyframes revealScan {
+  from {
+    opacity: 0;
+    filter: brightness(1.5) blur(6px);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1) blur(0);
+  }
+}
+
+@keyframes lightSweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
