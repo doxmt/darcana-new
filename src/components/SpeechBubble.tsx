@@ -1,26 +1,34 @@
 type SpeechBubbleProps = {
-  text: React.ReactNode;
-  children?: React.ReactNode;
+  children: React.ReactNode;
+  bubbleId?: number;
 };
 
-export default function SpeechBubble({ text, children }: SpeechBubbleProps) {
+export default function SpeechBubble({
+  children,
+  bubbleId,
+}: SpeechBubbleProps) {
+  const bubbleStyle =
+    bubbleId === 1
+      ? "bg-[#fdfdfd] border-[#e0e0e0] text-gray-900"
+      : bubbleId === 2
+      ? "bg-[#f4efff] border-[#c7b5ff]"
+      : "bg-white border-gray-200";
+
   return (
     <div
-      className="
+      className={`
         relative 
-        p-4 
-        bg-white 
+        p-6 
         rounded-2xl 
         shadow-md
-        h-full 
         border 
-        flex flex-col items-center justify-center
         SpeechBubble
-      "
+        ${bubbleStyle}
+      `}
     >
-      <p className="text-gray-800 leading-relaxed">{text}</p>
-
-      {children && <div className="mt-3">{children}</div>}
+      <div className="text-gray-800 leading-relaxed whitespace-pre-line text-center">
+        {children}
+      </div>
     </div>
   );
 }

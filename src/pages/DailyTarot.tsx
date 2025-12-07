@@ -1,4 +1,4 @@
-import bg from "../assets/bg/BackGround.png";
+import bg from "../assets/bg/BackGround1.png";
 import { getTarotgirlImage } from "../util/get-tarotgirl-image";
 import SpeechBubble from "../components/SpeechBubble";
 import DailyCard from "../components/Card/DailyCard";
@@ -39,15 +39,22 @@ export default function DailyTarot() {
         <img src={getTarotgirlImage(1)} className="w-[30vw] h-auto" />
       </div>
       <div className="absolute top-[10%] right-[2%] w-[30vw] h-[22vh]">
-        <SpeechBubble
-          text={
-            selectedCard
-              ? `${selectedCard.id}번 카드인 ${selectedCard.nameKo}카드를 ${direction}방향으로 뽑으셨습니다.`
-              : "카드 뽑기 버튼을 눌러 오늘의 카드를 뽑아보세요"
-          }
-        >
+        <SpeechBubble bubbleId={1}>
+          {selectedCard
+            ? `${selectedCard.id}번 카드인 '${selectedCard.nameKo}' 카드를 ${direction} 방향으로 뽑으셨습니다.`
+            : "카드 뽑기 버튼을 눌러 오늘의 카드를 뽑아보세요"}
+
           {selectedCard && (
-            <Button text="카드 해설 보기" onClick={() => nav("/interpret")} />
+            <div className="w-full flex justify-center  mt-4">
+              <Button
+                text="카드 해설 보기"
+                onClick={() =>
+                  nav(
+                    `/interpret/${selectedCard.id}?rev=${selectedCard.isReversed}`
+                  )
+                }
+              />
+            </div>
           )}
         </SpeechBubble>
       </div>
