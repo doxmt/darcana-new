@@ -12,7 +12,9 @@ export default function SpeechBubble({
       ? "bg-[#fdfdfd] border-[#e0e0e0] text-gray-900"
       : bubbleId === 2
       ? "bg-[#f4efff] border-[#c7b5ff]"
-      : "bg-white border-gray-200";
+      : bubbleId === 3
+      ? "bg-[linear-gradient(135deg,rgba(30,30,60,0.9),rgba(10,10,25,0.85))] border-2 border-[rgba(180,160,255,0.6)] text-[#f1e9ff]"
+      : "";
 
   return (
     <div

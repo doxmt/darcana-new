@@ -14,7 +14,7 @@ export default function App() {
 
         <Route path="daily" element={<DailyTarot />} />
         <Route path="theme" element={<ThemeTarot />} />
-        <Route path="interpret" element={<Interpret />} />
+        <Route path="interpret/:id" element={<Interpret />} />
         <Route path="*" element={<Notfound />} />
       </Route>
     </Routes>
