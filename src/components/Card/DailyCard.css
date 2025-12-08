@@ -94,3 +94,8 @@
     transform: scale(1.2);
   }
 }
+
+/* 역방향 카드 뒤집기 */
+.card.reverse img {
+  transform: rotate(180deg);
+}

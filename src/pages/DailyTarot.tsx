@@ -31,6 +31,7 @@ export default function DailyTarot() {
             onDraw={handleDraw}
             image={selectedCard ? getCardImage(selectedCard.id) : cardBehind}
             revealed={revealed}
+            reversed={selectedCard?.isReversed ?? false}
           />
         </div>
       </div>
