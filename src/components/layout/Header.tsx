@@ -25,7 +25,7 @@ export default function Header() {
         </Link>
 
         <Link
-          to="/interpret"
+          to="/analysis"
           className="hover:text-[#5c4ac7] hover:underline underline-offset-4 hover:decoration-[#5c4ac7] transition"
         >
           카드 해석
