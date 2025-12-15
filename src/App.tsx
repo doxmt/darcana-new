@@ -5,6 +5,7 @@ import DailyTarot from "./pages/DailyTarot";
 import ThemeTarot from "./pages/ThemeTarot.tsx";
 import Interpret from "./pages/Interpret";
 import Notfound from "./pages/Notfound.tsx";
+import CardAnalysis from "./pages/CardAnalysis.tsx";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="daily" element={<DailyTarot />} />
         <Route path="theme" element={<ThemeTarot />} />
         <Route path="interpret/:id" element={<Interpret />} />
+        <Route path="analysis/" element={<CardAnalysis />} />
         <Route path="*" element={<Notfound />} />
       </Route>
     </Routes>
