@@ -3,7 +3,7 @@ import { getTarotgirlImage } from "../util/get-tarotgirl-image";
 import SpeechBubble from "../components/SpeechBubble";
 import DailyCard from "../components/Card/DailyCard";
 import { drawMajorArcana, type DrawResult } from "../util/draw-card";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getCardImage } from "../util/get-card-image";
 import cardBehind from "../assets/cards/CardBehind.png";
 import Button from "../components/Button";
@@ -13,12 +13,26 @@ export default function DailyTarot() {
   const nav = useNavigate();
   const [selectedCard, setSelectedCard] = useState<DrawResult | null>(null);
   const [revealed, setRevealed] = useState(false);
+
+  const direction = selectedCard?.isReversed ? "역" : "정";
+  const todayKey = `daily-tarot-${new Date().toISOString().slice(0, 10)}`;
+  useEffect(() => {
+    const saved = localStorage.getItem(todayKey);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setSelectedCard(parsed);
+      setRevealed(true);
+    }
+  }, []);
   const handleDraw = () => {
+    if (revealed) return alert("카드는 하루에 한 번만 뽑을 수 있습니다!");
+
     const result = drawMajorArcana();
     setSelectedCard(result);
     setRevealed(true);
+
+    localStorage.setItem(todayKey, JSON.stringify(result));
   };
-  const direction = selectedCard?.isReversed ? "역" : "정";
 
   return (
     <div
