@@ -41,7 +41,14 @@ export default function Interpret() {
 
         <img
           src={getCardImage(cardId)}
-          className="absolute w-[8vw] left-[79%] top-[15%] animate-smooth-float "
+          className="
+    absolute
+    w-[8vw]
+    left-[79%]
+    top-[15%]
+
+    animate-[float_4s_ease-in-out_infinite]
+  "
         />
       </div>
 
@@ -57,12 +64,12 @@ export default function Interpret() {
     drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]
   "
           >
-            {cardData.id}번 카드인 {cardData.nameKo} 카드를 {direction} 방향으로
+            {cardData.id}번 카드인 {cardData.nameKo} 카드를 {direction} 으로
             뽑으셨습니다.
           </p>
 
           <p className="text-purple-200 text-center leading-relaxed mb-4">
-            역방향 {cardData.nameKo} 카드의
+            {direction} {cardData.nameKo} 카드의
             <span className="text-yellow-300 font-bold drop-shadow-[0_0_6px_rgba(255,230,120,0.7)] mx-1">
               키워드
             </span>
