@@ -41,14 +41,17 @@ export default function Interpret() {
 
         <img
           src={getCardImage(cardId)}
-          className="
-    absolute
-    w-[8vw]
-    left-[79%]
-    top-[15%]
-
-    animate-[float_4s_ease-in-out_infinite]
-  "
+          className={[
+            "absolute",
+            "w-[8vw]",
+            "left-[79%]",
+            "top-[15%]",
+            "animate-[float_4s_ease-in-out_infinite]",
+            "transition-transform duration-500 ease-in-out",
+            isReversed && "rotate-180",
+          ]
+            .filter(Boolean)
+            .join(" ")}
         />
       </div>
 
