@@ -1,5 +1,4 @@
 import CardItem from "./CardItem";
-import { allCards } from "../../data/CardData";
 import type { TarotCard } from "../../data/CardData";
 
 type CardContainerProps = {

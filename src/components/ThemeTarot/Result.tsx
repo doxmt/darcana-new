@@ -25,8 +25,6 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<TarotResponse | null>(null);
-  const currentCardIndex = step - 2;
-  const currentCard = cards[currentCardIndex];
 
   useEffect(() => {
     const fetchTarot = async () => {
