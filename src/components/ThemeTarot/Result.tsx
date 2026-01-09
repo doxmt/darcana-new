@@ -25,12 +25,13 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
   const [result, setResult] = useState<TarotResponse | null>(null);
+  const API_BASE = import.meta.env.VITE_TAROT_API_URL;
 
   useEffect(() => {
     const fetchTarot = async () => {
       try {
         setLoading(true);
-        const res = await fetch("/theme-tarot", {
+        const res = await fetch(`${API_BASE}/theme-tarot`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ theme, cards }),
@@ -45,7 +46,7 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
     };
 
     fetchTarot();
-  }, [theme, cards]);
+  }, [theme, cards, API_BASE]);
 
   if (loading || !result) {
     return (
