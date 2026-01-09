@@ -135,6 +135,6 @@ def theme_tarot():
         print("❌ Tarot API Error:", e)
         return jsonify({"error": "타로 해석 실패"}), 500
 
-
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
