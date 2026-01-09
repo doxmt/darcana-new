@@ -1,19 +1,35 @@
 # app.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from dotenv import load_dotenv
 from openai import OpenAI
 import json
+import os
 
-# =============================
-# 환경 변수 로드
-# =============================
-load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(
+    app,
+    resources={
+        r"/theme-tarot": {
+            "origins": [
+                "http://localhost:5173",        
+                "https://darcana-new.vercel.app"
+            ]
+        }
+    },
+)
 
-client = OpenAI()
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+def safe_json_parse(text: str):
+    text = text.strip()
+
+    # ```json ... ``` 형태 제거
+    if text.startswith("```"):
+        text = text.replace("```json", "").replace("```", "").strip()
+
+    return json.loads(text)
+
 
 # =============================
 # 카드 포맷 유틸
@@ -111,7 +127,8 @@ def theme_tarot():
         )
 
         content = res.choices[0].message.content
-        result = json.loads(content)
+        result = safe_json_parse(content)
+
         return jsonify(result)
 
     except Exception as e:
@@ -120,4 +137,4 @@ def theme_tarot():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5050, debug=True)
+    app.run(host="0.0.0.0", port=8080)
