@@ -7,17 +7,9 @@ import os
 
 
 app = Flask(__name__)
-CORS(
-    app,
-    resources={
-        r"/theme-tarot": {
-            "origins": [
-                "http://localhost:5173",        
-                "https://darcana-new.vercel.app"
-            ]
-        }
-    },
-)
+CORS(app)
+
+
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
