@@ -18,7 +18,6 @@ export default function ThemeTarot() {
       style={{ backgroundImage: `url(${bg})` }}
     >
       <div className="flex w-full h-full">
-        {/* Left area (Tarot girl) */}
         <div className="w-[30%] relative flex items-end justify-center">
           <img
             src={getTarotgirlImage(2)}
@@ -26,7 +25,6 @@ export default function ThemeTarot() {
           />
         </div>
 
-        {/* Right area (Content) */}
         <div className="w-[70%] flex items-center justify-center">
           {step === "theme" && (
             <Theme
