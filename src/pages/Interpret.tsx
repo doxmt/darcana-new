@@ -1,5 +1,5 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import bg from "../assets/bg/BackGround.png";
+import bg from "../assets/bg/BackGround.webp";
 import { getCardImage } from "../util/get-card-image";
 import { getTarotgirlImage } from "../util/get-tarotgirl-image";
 import { allCards } from "../data/CardData";

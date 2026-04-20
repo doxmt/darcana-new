@@ -1,4 +1,4 @@
-import bg from "../assets/bg/BackGround.png";
+import bg from "../assets/bg/BackGround.webp";
 import { getTarotgirlImage } from "../util/get-tarotgirl-image";
 import { useState } from "react";
 import type { DrawResult } from "../util/draw-card";
