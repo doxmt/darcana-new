@@ -1,5 +1,5 @@
 import { useState } from "react";
-import cardBehind from "../../assets/cards/CardBehind.png";
+import cardBehind from "../../assets/cards/CardBehind.webp";
 import type { DrawResult } from "../../util/draw-card";
 import { drawAllArcana } from "../../util/draw-card";
 import Button from "../Button";

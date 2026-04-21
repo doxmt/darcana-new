@@ -1,9 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 @keyframes float {
   0%,
@@ -12,5 +9,57 @@
   }
   50% {
     transform: translateY(-12px);
+  }
+}
+
+@keyframes revealScan {
+  from {
+    opacity: 0;
+    filter: brightness(1.5) blur(6px);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1) blur(0);
+  }
+}
+
+@keyframes lightSweep {
+  0% {
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0vh, 0);
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(-10px, 50vh, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(10px, 110vh, 0);
   }
 }

@@ -1,5 +1,4 @@
 import { useParams, useSearchParams } from "react-router-dom";
-import bg from "../assets/bg/BackGround.webp";
 import { getCardImage } from "../util/get-card-image";
 import { getTarotgirlImage } from "../util/get-tarotgirl-image";
 import { allCards } from "../data/CardData";
@@ -33,8 +32,7 @@ export default function Interpret() {
 
   return (
     <div
-      className="relative w-screen h-screen bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${bg})` }}
+      className="relative w-screen h-screen bg-[url('/BackGround.webp')] bg-cover bg-center bg-no-repeat"
     >
       <div className="absolute bottom-0 left-[-5%]">
         <img src={getTarotgirlImage(2)} className="w-[40vw]" />

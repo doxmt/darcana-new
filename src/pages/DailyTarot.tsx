@@ -1,11 +1,10 @@
-import bg from "../assets/bg/BackGround1.png";
 import { getTarotgirlImage } from "../util/get-tarotgirl-image";
 import SpeechBubble from "../components/SpeechBubble";
 import DailyCard from "../components/Card/DailyCard";
 import { drawMajorArcana, type DrawResult } from "../util/draw-card";
 import { useState, useEffect } from "react";
 import { getCardImage } from "../util/get-card-image";
-import cardBehind from "../assets/cards/CardBehind.png";
+import cardBehind from "../assets/cards/CardBehind.webp";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 
@@ -36,8 +35,7 @@ export default function DailyTarot() {
 
   return (
     <div
-      className="relative w-screen h-screen bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${bg})` }}
+      className="relative w-screen h-screen bg-[url('/BackGround1.webp')] bg-cover bg-center bg-no-repeat"
     >
       <div className="w-screen h-screen flex items-center justify-center">
         <div className="w-[18vw]">

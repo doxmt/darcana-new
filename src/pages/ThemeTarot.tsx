@@ -1,4 +1,3 @@
-import bg from "../assets/bg/BackGround.webp";
 import { getTarotgirlImage } from "../util/get-tarotgirl-image";
 import { useState } from "react";
 import type { DrawResult } from "../util/draw-card";
@@ -14,8 +13,7 @@ export default function ThemeTarot() {
 
   return (
     <div
-      className="relative w-screen h-screen bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${bg})` }}
+      className="relative w-screen h-screen bg-[url('/BackGround.webp')] bg-cover bg-center bg-no-repeat"
     >
       <div className="flex w-full h-full">
         <div className="w-[30%] relative flex items-end justify-center">

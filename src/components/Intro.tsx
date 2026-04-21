@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import "./Intro.css";
 import Button from "./Button";
 import SpeechBubble from "./SpeechBubble";
 import { getTarotgirlImage } from "../util/get-tarotgirl-image";
@@ -17,7 +16,9 @@ export default function IntroSnow() {
 
     function createSnow() {
       const el = document.createElement("div");
-      el.className = "snow";
+      el.dataset.snow = "true";
+      el.className =
+        "absolute bg-[gold] opacity-0 [clip-path:polygon(50%_0%,61%_35%,98%_35%,68%_57%,79%_91%,50%_70%,21%_91%,32%_57%,2%_35%,39%_35%)] [animation:fall_10s_linear_infinite]";
 
       el.style.left = Math.floor(Math.random() * W) + "px";
       el.style.top = "-12px";
@@ -35,12 +36,15 @@ export default function IntroSnow() {
     for (let i = 0; i < 50; i++) createSnow();
 
     return () => {
-      container.querySelectorAll(".snow").forEach((n) => n.remove());
+      container.querySelectorAll("[data-snow]").forEach((n) => n.remove());
     };
   }, []);
 
   return (
-    <div className="IntroSnow" ref={containerRef}>
+    <div
+      className="relative w-full h-screen overflow-hidden bg-[radial-gradient(ellipse_at_bottom,#1b2735_0%,#090a0f_100%)]"
+      ref={containerRef}
+    >
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30vw] h-[20vh]">
         <SpeechBubble bubbleId={1}>
           카드를 뽑고 오늘의 운세를 확인해 보세요 ✨
