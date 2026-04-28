@@ -50,6 +50,14 @@ def format_card_detail(c):
 
 
 # =============================
+# 헬스체크
+# =============================
+@app.route('/health')
+def health():
+    return 'OK', 200
+
+
+# =============================
 # 메인 API
 # =============================
 @app.route("/theme-tarot", methods=["POST"])
