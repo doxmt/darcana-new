@@ -12,8 +12,6 @@ export default function CardAnalysis() {
   const [query, setQuery] = useState("");
 
   const filteredCards = useMemo(() => {
-    console.log("카드 필터 계산");
-
     const q = query.toLowerCase();
 
     return allCards.filter((card) => {
