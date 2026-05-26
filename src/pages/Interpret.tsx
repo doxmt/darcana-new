@@ -65,7 +65,7 @@ export default function Interpret() {
     drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]
   "
           >
-            {cardData.id}번 카드인 {cardData.nameKo} 카드를 {direction} 으로
+            {cardData.id}번 카드인 {cardData.nameKo} 카드를 {direction}으로
             뽑으셨습니다.
           </p>
 
@@ -76,16 +76,12 @@ export default function Interpret() {
             </span>
             는
             <span className="text-yellow-300 font-bold drop-shadow-[0_0_6px_rgba(255,230,120,0.7)] mx-1">
-              "{Array.isArray(keywords) ? keywords.join(", ") : keywords}"
+              "{keywords.join(", ")}"
             </span>
             이며, <br />
             이는 &nbsp;
             <span className="text-blue-300 font-bold italic mx-1">
-              "
-              {Array.isArray(description)
-                ? description.join(", ")
-                : description}
-              "
+              "{description}"
             </span>
             &nbsp; 라는 의미를 지닙니다.
           </p>
