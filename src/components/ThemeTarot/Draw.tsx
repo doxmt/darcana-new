@@ -1,7 +1,7 @@
 import { useState } from "react";
 import cardBehind from "../../assets/cards/CardBehind.webp";
 import type { DrawResult } from "../../util/draw-card";
-import { drawAllArcana } from "../../util/draw-card";
+import { allCards } from "../../data/CardData";
 import Button from "../Button";
 
 type DrawProps = {
@@ -23,8 +23,12 @@ export default function Draw({ onComplete }: DrawProps) {
   };
 
   const handleComplete = () => {
-    const randomCards = drawAllArcana(3);
-    onComplete(randomCards);
+    const picked: DrawResult[] = selectedSlots.map((idx) => ({
+      id: allCards[idx].id,
+      nameKo: allCards[idx].nameKo,
+      isReversed: Math.random() < 0.5,
+    }));
+    onComplete(picked);
   };
 
   return (
