@@ -24,6 +24,8 @@ type TarotResponse = {
 export default function Result({ theme, cards, onRestart }: ResultProps) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
   const [result, setResult] = useState<TarotResponse | null>(null);
   const API_BASE = import.meta.env.VITE_TAROT_API_URL;
 
@@ -31,27 +33,42 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
     const fetchTarot = async () => {
       try {
         setLoading(true);
+        setError(false);
         const res = await fetch(`${API_BASE}/theme-tarot`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ theme, cards }),
         });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         setResult(data);
       } catch (err) {
         console.error("API 호출 실패:", err);
+        setError(true);
       } finally {
         setLoading(false);
       }
     };
 
     fetchTarot();
-  }, [theme, cards, API_BASE]);
+  }, [theme, cards, API_BASE, retryCount]);
 
-  if (loading || !result) {
+  if (loading) {
     return (
       <div className="text-white text-xl animate-pulse">
         🔮 해석을 불러오는 중입니다… 잠시만 기다려주세요…
+      </div>
+    );
+  }
+
+  if (error || !result) {
+    return (
+      <div className="flex flex-col items-center gap-4 text-white">
+        <p className="text-xl">해석을 불러오지 못했습니다.</p>
+        <div className="flex gap-3">
+          <Button text="다시 시도" onClick={() => setRetryCount((c) => c + 1)} />
+          <Button text="처음으로" onClick={onRestart} />
+        </div>
       </div>
     );
   }
