@@ -21,6 +21,48 @@ type TarotResponse = {
   summary: string;
 };
 
+function SelectedCards({ cards }: { cards: DrawResult[] }) {
+  return (
+    <div className="flex gap-[3vw] justify-center mb-[3vh]">
+      {cards.map((card) => (
+        <div key={card.id} className="flex flex-col items-center gap-[1vh]">
+          <img
+            src={getCardImage(card.id)}
+            className={`
+            w-[clamp(90px,9vw,160px)]
+            transition-transform duration-300
+            ${card.isReversed ? "rotate-180" : ""}
+            drop-shadow-[0_0_20px_rgba(180,200,255,0.6)]
+          `}
+          />
+          <div className="text-[clamp(11px,1.2vw,14px)] text-indigo-100 opacity-90">
+            {card.nameKo} · {card.isReversed ? "역방향" : "정방향"}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SingleCard({ card }: { card: DrawResult }) {
+  return (
+    <div className="flex flex-col items-center mb-[2.5vh]">
+      <img
+        src={getCardImage(card.id)}
+        className={`
+        w-[clamp(110px,10vw,180px)]
+        transition-transform duration-300
+        ${card.isReversed ? "rotate-180" : ""}
+        drop-shadow-[0_0_25px_rgba(180,200,255,0.65)]
+      `}
+      />
+      <div className="mt-[1vh] text-[clamp(12px,1.3vw,15px)] text-indigo-100 opacity-90">
+        {card.nameKo} · {card.isReversed ? "역방향" : "정방향"}
+      </div>
+    </div>
+  );
+}
+
 export default function Result({ theme, cards, onRestart }: ResultProps) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -80,49 +122,11 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
     </div>
   );
 
-  const RenderSelectedCards = () => (
-    <div className="flex gap-[3vw] justify-center mb-[3vh]">
-      {cards.map((card) => (
-        <div key={card.id} className="flex flex-col items-center gap-[1vh]">
-          <img
-            src={getCardImage(card.id)}
-            className={`
-            w-[clamp(90px,9vw,160px)]
-            transition-transform duration-300
-            ${card.isReversed ? "rotate-180" : ""}
-            drop-shadow-[0_0_20px_rgba(180,200,255,0.6)]
-          `}
-          />
-
-          <div className="text-[clamp(11px,1.2vw,14px)] text-indigo-100 opacity-90">
-            {card.nameKo} · {card.isReversed ? "역방향" : "정방향"}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-  const RenderSingleCard = ({ card }: { card: DrawResult }) => (
-    <div className="flex flex-col items-center mb-[2.5vh]">
-      <img
-        src={getCardImage(card.id)}
-        className={`
-        w-[clamp(110px,10vw,180px)]
-        transition-transform duration-300
-        ${card.isReversed ? "rotate-180" : ""}
-        drop-shadow-[0_0_25px_rgba(180,200,255,0.65)]
-      `}
-      />
-      <div className="mt-[1vh] text-[clamp(12px,1.3vw,15px)] text-indigo-100 opacity-90">
-        {card.nameKo} · {card.isReversed ? "역방향" : "정방향"}
-      </div>
-    </div>
-  );
-
   return (
     <div className="text-white w-full h-full flex flex-col items-center px-[4vw] py-[3vh]">
       {step === 1 && (
         <SpeechBubble bubbleId={3}>
-          <RenderSelectedCards />
+          <SelectedCards cards={cards} />
 
           <div className="text-white whitespace-pre-line">{result.intro}</div>
 
@@ -132,7 +136,7 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
 
       {step >= 2 && step <= 4 && (
         <SpeechBubble bubbleId={3}>
-          <RenderSingleCard card={cards[step - 2]} />
+          <SingleCard card={cards[step - 2]} />
 
           <div className="text-white whitespace-pre-line font-semibold mb-2">
             {result.cards[step - 2].title}
@@ -148,7 +152,7 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
 
       {step === 5 && (
         <SpeechBubble bubbleId={3}>
-          <RenderSelectedCards />
+          <SelectedCards cards={cards} />
 
           <div className="text-white whitespace-pre-line">{result.summary}</div>
 
