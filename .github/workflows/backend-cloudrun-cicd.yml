@@ -1,0 +1,244 @@
+name: Backend Cloud Run CI/CD
+
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-cloudrun-cicd.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - ".github/workflows/backend-cloudrun-cicd.yml"
+
+concurrency:
+  group: backend-cloudrun-cicd-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  docker-build:
+    name: Build Docker image with cache
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      build_duration: ${{ steps.report.outputs.build_duration }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Record build start
+        run: echo "BUILD_START=$(date +%s)" >> "$GITHUB_ENV"
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: false
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,scope=backend,mode=max
+
+      - name: Report build duration
+        id: report
+        if: always()
+        run: |
+          elapsed=$(( $(date +%s) - BUILD_START ))
+          echo "build_duration=${elapsed}" >> "$GITHUB_OUTPUT"
+          {
+            echo "## Docker Build Performance (PR Check)"
+            echo "| Metric | Value |"
+            echo "|---|---|"
+            echo "| Build duration | ${elapsed}s |"
+            echo "| Run \# | ${{ github.run_number }} |"
+            echo "| Cache | GHA scope=backend |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  pr-comment:
+    name: Comment build result
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: always() && github.event_name == 'pull_request'
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Comment on pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = '${{ needs.docker-build.result }}'
+            const duration = '${{ needs.docker-build.outputs.build_duration }}'
+            const status = result === 'success' ? '✅ 성공' : '❌ 실패'
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                `Docker build: ${status}`,
+                `Duration: ${duration}s (Run #${{ github.run_number }})`,
+              ].join('\n'),
+            })
+
+  deploy-to-cloud-run:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    needs: docker-build
+    if: github.event_name == 'push'
+    timeout-minutes: 20
+    outputs:
+      service_url: ${{ steps.get-url.outputs.service_url }}
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      GAR_REPOSITORY: ${{ vars.GAR_REPOSITORY }}
+      CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
+      IMAGE_NAME: darcana-backend
+      OPENAI_API_KEY_SECRET_NAME: ${{ vars.OPENAI_API_KEY_SECRET_NAME }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate Cloud Run environment
+        run: |
+          test -n "$GCP_PROJECT_ID"
+          test -n "$GCP_REGION"
+          test -n "$GAR_REPOSITORY"
+          test -n "$CLOUD_RUN_SERVICE"
+
+      - name: Configure Docker auth
+        run: gcloud auth configure-docker "$GCP_REGION-docker.pkg.dev" --quiet
+
+      - name: Build image metadata
+        run: |
+          image_base="$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/$GAR_REPOSITORY/$IMAGE_NAME"
+          echo "IMAGE=$image_base:${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "IMAGE_LATEST=$image_base:latest" >> "$GITHUB_ENV"
+
+      - name: Record build start
+        run: echo "BUILD_START=$(date +%s)" >> "$GITHUB_ENV"
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.IMAGE }}
+            ${{ env.IMAGE_LATEST }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,scope=backend,mode=max
+
+      - name: Report build duration
+        if: always()
+        run: |
+          elapsed=$(( $(date +%s) - BUILD_START ))
+          {
+            echo "## Docker Build Performance (Deploy)"
+            echo "| Metric | Value |"
+            echo "|---|---|"
+            echo "| Build + push duration | ${elapsed}s |"
+            echo "| Run \# | ${{ github.run_number }} |"
+            echo "| Cache | GHA scope=backend |"
+            echo "| Image | \`$IMAGE\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy to Cloud Run
+        run: |
+          deploy_args=(
+            "$CLOUD_RUN_SERVICE"
+            --image "$IMAGE"
+            --project "$GCP_PROJECT_ID"
+            --region "$GCP_REGION"
+            --platform managed
+            --port 8080
+            --allow-unauthenticated
+            --quiet
+          )
+
+          if [ -n "$OPENAI_API_KEY_SECRET_NAME" ]; then
+            deploy_args+=(--set-secrets "OPENAI_API_KEY=${OPENAI_API_KEY_SECRET_NAME}:latest")
+          fi
+
+          gcloud run deploy "${deploy_args[@]}"
+
+      - name: Get service URL
+        id: get-url
+        run: |
+          url="$(gcloud run services describe "$CLOUD_RUN_SERVICE" \
+            --project "$GCP_PROJECT_ID" \
+            --region "$GCP_REGION" \
+            --format='value(status.url)')"
+          echo "service_url=$url" >> "$GITHUB_OUTPUT"
+          echo "SERVICE_URL=$url" >> "$GITHUB_ENV"
+
+      - name: Check health
+        run: |
+          for attempt in {1..10}; do
+            if curl --fail --silent --show-error "$SERVICE_URL/health"; then
+              exit 0
+            fi
+            sleep 6
+          done
+
+          exit 1
+
+  deploy-comment:
+    name: Comment deploy result
+    runs-on: ubuntu-latest
+    needs: deploy-to-cloud-run
+    if: always() && github.event_name == 'push'
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Comment on associated PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = '${{ needs.deploy-to-cloud-run.result }}'
+            const serviceUrl = '${{ needs.deploy-to-cloud-run.outputs.service_url }}'
+            const status = result === 'success' ? '✅ 성공' : '❌ 실패'
+
+            const prs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: context.sha,
+            })
+
+            if (prs.data.length === 0) return
+
+            const lines = [`Cloud Run 배포: ${status}`]
+            if (result === 'success' && serviceUrl) {
+              lines.push(`URL: ${serviceUrl}`)
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prs.data[0].number,
+              body: lines.join('\n'),
+            })
