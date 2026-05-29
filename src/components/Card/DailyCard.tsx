@@ -17,7 +17,7 @@ export default function DailyCard({
     <div className="flex flex-col items-center gap-4">
       <div
         className={[
-          "relative w-[216px] h-[384px] rounded-lg cursor-pointer overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.3)]",
+          "relative aspect-[9/16] w-[clamp(160px,55vw,216px)] rounded-lg cursor-pointer overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.3)]",
           revealed &&
             [
               "after:content-[''] after:absolute after:inset-0",
@@ -33,7 +33,7 @@ export default function DailyCard({
       >
         <img
           src={image}
-          alt="타로 카드"
+          alt={revealed ? "뽑은 타로 카드" : "뒤집힌 타로 카드"}
           className={[
             "w-full h-full object-cover rounded-[inherit]",
             revealed && "absolute [animation:revealScan_3s_ease_forwards] opacity-0",
@@ -44,7 +44,7 @@ export default function DailyCard({
         />
       </div>
 
-      <Button onClick={onDraw} text="카드 뽑기" />
+      <Button onClick={onDraw} text={revealed ? "오늘의 카드 완료" : "카드 뽑기"} disabled={revealed} />
     </div>
   );
 }

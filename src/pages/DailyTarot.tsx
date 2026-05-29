@@ -8,23 +8,51 @@ import cardBehind from "../assets/cards/CardBehind.webp";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 
+const getLocalDateKey = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `daily-tarot-${year}-${month}-${day}`;
+};
+
+const readSavedDailyCard = (key: string): DrawResult | null => {
+  try {
+    const saved = localStorage.getItem(key);
+    if (!saved) return null;
+
+    const parsed = JSON.parse(saved) as Partial<DrawResult>;
+    if (
+      typeof parsed.id !== "number" ||
+      typeof parsed.nameKo !== "string" ||
+      typeof parsed.isReversed !== "boolean"
+    ) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return parsed as DrawResult;
+  } catch {
+    localStorage.removeItem(key);
+    return null;
+  }
+};
+
 export default function DailyTarot() {
   const nav = useNavigate();
-  const [todayKey] = useState(
-    () => `daily-tarot-${new Date().toISOString().slice(0, 10)}`
-  );
+  const [todayKey] = useState(getLocalDateKey);
   const [{ selectedCard, revealed }, setDailyTarot] = useState<{
     selectedCard: DrawResult | null;
     revealed: boolean;
   }>(() => {
-    const saved = localStorage.getItem(todayKey);
-
+    const saved = readSavedDailyCard(todayKey);
     if (!saved) {
       return { selectedCard: null, revealed: false };
     }
 
     return {
-      selectedCard: JSON.parse(saved) as DrawResult,
+      selectedCard: saved,
       revealed: true,
     };
   });
@@ -41,10 +69,31 @@ export default function DailyTarot() {
 
   return (
     <div
-      className="relative w-screen h-screen bg-[url('/BackGround1.webp')] bg-cover bg-center bg-no-repeat"
+      className="relative min-h-[max(760px,calc(100dvh-112px))] w-full overflow-x-hidden overflow-y-auto bg-[url('/BackGround1.webp')] bg-cover bg-center bg-no-repeat"
     >
-      <div className="w-screen h-screen flex items-center justify-center">
-        <div className="w-[18vw]">
+      <div className="relative z-10 flex min-h-[max(760px,calc(100dvh-112px))] flex-col items-center justify-center gap-6 px-4 py-8 md:block md:p-0">
+        <div className="w-full max-w-md md:absolute md:right-[2%] md:top-[8%] md:w-[min(90vw,420px)] md:max-w-none">
+          <SpeechBubble bubbleId={1}>
+            {selectedCard
+              ? `${selectedCard.id}번 카드인 '${selectedCard.nameKo}' 카드를 ${direction} 방향으로 뽑으셨습니다.`
+              : "카드 뽑기 버튼을 눌러 오늘의 카드를 뽑아보세요"}
+
+            {selectedCard && (
+              <div className="mt-4 flex w-full justify-center">
+                <Button
+                  text="카드 해설 보기"
+                  onClick={() =>
+                    nav(
+                      `/interpret/${selectedCard.id}?rev=${selectedCard.isReversed}`
+                    )
+                  }
+                />
+              </div>
+            )}
+          </SpeechBubble>
+        </div>
+
+        <div className="md:absolute md:left-1/2 md:top-1/2 md:w-[clamp(160px,18vw,260px)] md:-translate-x-1/2 md:-translate-y-1/2">
           <DailyCard
             onDraw={handleDraw}
             image={selectedCard ? getCardImage(selectedCard.id) : cardBehind}
@@ -54,28 +103,12 @@ export default function DailyTarot() {
         </div>
       </div>
 
-      <div className="absolute bottom-0 right-0 ">
-        <img src={getTarotgirlImage(1)} className="w-[30vw] h-auto" />
-      </div>
-      <div className="absolute top-[10%] right-[2%] w-[30vw] h-[22vh]">
-        <SpeechBubble bubbleId={1}>
-          {selectedCard
-            ? `${selectedCard.id}번 카드인 '${selectedCard.nameKo}' 카드를 ${direction} 방향으로 뽑으셨습니다.`
-            : "카드 뽑기 버튼을 눌러 오늘의 카드를 뽑아보세요"}
-
-          {selectedCard && (
-            <div className="w-full flex justify-center  mt-4">
-              <Button
-                text="카드 해설 보기"
-                onClick={() =>
-                  nav(
-                    `/interpret/${selectedCard.id}?rev=${selectedCard.isReversed}`
-                  )
-                }
-              />
-            </div>
-          )}
-        </SpeechBubble>
+      <div className="pointer-events-none absolute bottom-0 right-0">
+        <img
+          src={getTarotgirlImage(1)}
+          alt=""
+          className="h-auto w-[clamp(190px,45vw,420px)]"
+        />
       </div>
     </div>
   );

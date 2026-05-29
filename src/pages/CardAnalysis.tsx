@@ -32,17 +32,17 @@ export default function CardAnalysis() {
 
   return (
     <div
-      className="absolute w-full flex flex-col items-center bg-[linear-gradient(160deg,#232526_0%,#414345_100%)] min-h-screen"
+      className="relative flex min-h-[calc(100dvh-112px)] w-full min-w-0 flex-col items-center overflow-x-hidden bg-[linear-gradient(160deg,#232526_0%,#414345_100%)] px-4 pb-14 sm:px-6"
     >
-      <div className="flex flex-row items-center justify-center w-[40%] mt-15">
-        <img src={TarotCardIcon} className="w-[5%] mr-2" />
+      <div className="flex flex-row items-center justify-center w-full max-w-xl mt-10 sm:mt-15">
+        <img src={TarotCardIcon} className="w-6 h-6 mr-2" />
         <h4 className="text-xl font-semibold text-white">카드 해석</h4>
       </div>
-      <div className="w-[40%] mt-10">
+      <div className="w-full max-w-xl mt-8 sm:mt-10">
         <SearchBar value={query} onChange={(e) => setQuery(e.target.value)} />
       </div>
 
-      <div className="flex flex-row gap-3 mt-10 ">
+      <div className="flex flex-row flex-wrap justify-center gap-2 sm:gap-3 w-full max-w-xl mt-8 sm:mt-10">
         <Button
           text="전체"
           onClick={() => setFilter("all")}
@@ -60,7 +60,7 @@ export default function CardAnalysis() {
         />
       </div>
 
-      <div>
+      <div className="w-full">
         <CardContainer
           cards={filteredCards}
           onCardClick={(card) => setSelectedCard(card)}

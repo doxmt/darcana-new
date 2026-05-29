@@ -26,6 +26,10 @@ dist-ssr
 .env
 backend/.env
 
+# Python
+__pycache__/
+*.pyc
+
 src/data/CardData.tsx
 .vercel
 .env*

@@ -11,7 +11,7 @@ export default function CardContainer({
   onCardClick,
 }: CardContainerProps) {
   return (
-    <div className="w-full flex flex-wrap justify-center gap-10 mt-10 ">
+    <div className="mx-auto mt-8 grid w-full max-w-6xl grid-cols-[repeat(auto-fit,120px)] justify-center gap-x-4 gap-y-5 px-1 sm:mt-10 sm:grid-cols-[repeat(auto-fit,128px)] sm:gap-x-5 sm:gap-y-6">
       {cards.map((card) => (
         <CardItem
           key={card.id}

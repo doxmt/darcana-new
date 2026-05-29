@@ -32,16 +32,19 @@ export default function Interpret() {
 
   return (
     <div
-      className="relative w-screen h-screen bg-[url('/BackGround.webp')] bg-cover bg-center bg-no-repeat"
+      className="relative min-h-[max(720px,calc(100dvh-112px))] w-full overflow-x-hidden overflow-y-auto bg-[url('/BackGround.webp')] bg-cover bg-center bg-no-repeat px-4 py-6 md:px-0 md:py-0"
     >
-      <div className="absolute bottom-0 left-[-5%]">
-        <img src={getTarotgirlImage(2)} className="w-[40vw]" />
+      <div className="pointer-events-none absolute bottom-0 left-[-18%] opacity-100 sm:left-[-8%] md:left-[-5%]">
+        <img
+          src={getTarotgirlImage(2)}
+          className="w-[clamp(280px,70vw,620px)] md:w-[40vw]"
+        />
 
         <img
           src={getCardImage(cardId)}
           className={[
             "absolute",
-            "w-[8vw]",
+            "w-[clamp(56px,14vw,120px)] md:w-[8vw]",
             "left-[79%]",
             "top-[15%]",
             "animate-[float_4s_ease-in-out_infinite]",
@@ -53,14 +56,16 @@ export default function Interpret() {
         />
       </div>
 
-      <div className="absolute top-[10%] right-[15%] w-[40vw]">
+      <div className="relative z-10 mx-auto w-full max-w-2xl pb-8 md:absolute md:right-[8%] md:top-[8%] md:mx-0 md:w-[48vw] md:max-w-none lg:right-[15%] lg:w-[40vw]">
         <SpeechBubble bubbleId={3}>
           <p
             className="
-    text-xl 
+    text-lg
+    sm:text-xl
     font-extrabold 
     text-white 
-    mb-6 
+    mb-4
+    sm:mb-6
     text-center
     drop-shadow-[0_0_10px_rgba(255,255,255,0.4)]
   "
@@ -69,7 +74,7 @@ export default function Interpret() {
             뽑으셨습니다.
           </p>
 
-          <p className="text-purple-200 text-center leading-relaxed mb-4">
+          <p className="text-center text-sm leading-relaxed text-purple-200 sm:text-base mb-4">
             {direction} {cardData.nameKo} 카드의
             <span className="text-yellow-300 font-bold drop-shadow-[0_0_6px_rgba(255,230,120,0.7)] mx-1">
               키워드
@@ -88,14 +93,17 @@ export default function Interpret() {
 
           <p
             className="
-      mt-6
-      p-6
+      mt-4
+      sm:mt-6
+      p-4
+      sm:p-6
       rounded-2xl
       bg-[rgba(70,60,120,0.35)]
       backdrop-blur-md
       border border-[rgba(160,130,255,0.4)]
       text-purple-100
-      text-lg
+      text-sm
+      sm:text-lg
       leading-relaxed
       shadow-[inset_0_0_12px_rgba(150,120,255,0.25)]
     "
