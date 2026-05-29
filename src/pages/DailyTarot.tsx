@@ -2,7 +2,7 @@ import { getTarotgirlImage } from "../util/get-tarotgirl-image";
 import SpeechBubble from "../components/SpeechBubble";
 import DailyCard from "../components/Card/DailyCard";
 import { drawMajorArcana, type DrawResult } from "../util/draw-card";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { getCardImage } from "../util/get-card-image";
 import cardBehind from "../assets/cards/CardBehind.webp";
 import Button from "../components/Button";
@@ -10,25 +10,31 @@ import { useNavigate } from "react-router-dom";
 
 export default function DailyTarot() {
   const nav = useNavigate();
-  const [selectedCard, setSelectedCard] = useState<DrawResult | null>(null);
-  const [revealed, setRevealed] = useState(false);
+  const [todayKey] = useState(
+    () => `daily-tarot-${new Date().toISOString().slice(0, 10)}`
+  );
+  const [{ selectedCard, revealed }, setDailyTarot] = useState<{
+    selectedCard: DrawResult | null;
+    revealed: boolean;
+  }>(() => {
+    const saved = localStorage.getItem(todayKey);
+
+    if (!saved) {
+      return { selectedCard: null, revealed: false };
+    }
+
+    return {
+      selectedCard: JSON.parse(saved) as DrawResult,
+      revealed: true,
+    };
+  });
 
   const direction = selectedCard?.isReversed ? "역" : "정";
-  const todayKey = `daily-tarot-${new Date().toISOString().slice(0, 10)}`;
-  useEffect(() => {
-    const saved = localStorage.getItem(todayKey);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      setSelectedCard(parsed);
-      setRevealed(true);
-    }
-  }, []);
   const handleDraw = () => {
     if (revealed) return alert("카드는 하루에 한 번만 뽑을 수 있습니다!");
 
     const result = drawMajorArcana();
-    setSelectedCard(result);
-    setRevealed(true);
+    setDailyTarot({ selectedCard: result, revealed: true });
 
     localStorage.setItem(todayKey, JSON.stringify(result));
   };

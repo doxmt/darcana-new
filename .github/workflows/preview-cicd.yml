@@ -1,0 +1,116 @@
+name: Preview CI/CD
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+concurrency:
+  group: preview-cicd-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  project-check:
+    name: Lint and build
+    runs-on: ubuntu-latest
+    env:
+      VITE_TAROT_API_URL: ${{ secrets.VITE_TAROT_API_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate build environment
+        run: test -n "$VITE_TAROT_API_URL"
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+  deploy-to-vercel:
+    name: Deploy to Vercel Preview
+    runs-on: ubuntu-latest
+    needs: project-check
+    outputs:
+      preview_url: ${{ steps.deploy.outputs.preview_url }}
+      current_time: ${{ steps.deploy.outputs.current_time }}
+    env:
+      VITE_TAROT_API_URL: ${{ secrets.VITE_TAROT_API_URL }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Validate Vercel environment
+        run: |
+          test -n "$VITE_TAROT_API_URL"
+          test -n "$VERCEL_ORG_ID"
+          test -n "$VERCEL_PROJECT_ID"
+          test -n "$VERCEL_TOKEN"
+
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+
+      - name: Build with Vercel
+        run: vercel build --token="$VERCEL_TOKEN"
+
+      - name: Deploy prebuilt output
+        id: deploy
+        run: |
+          preview_url="$(vercel deploy --prebuilt --token="$VERCEL_TOKEN")"
+          current_time="$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M:%S KST')"
+          echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
+          echo "current_time=$current_time" >> "$GITHUB_OUTPUT"
+
+  preview-comment:
+    name: Comment preview URL
+    runs-on: ubuntu-latest
+    needs: deploy-to-vercel
+    permissions:
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Comment on pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const previewUrl = '${{ needs.deploy-to-vercel.outputs.preview_url }}'
+            const currentTime = '${{ needs.deploy-to-vercel.outputs.current_time }}'
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                `Preview: ${previewUrl}`,
+                '',
+                `Update: ${currentTime}`,
+              ].join('\n'),
+            })

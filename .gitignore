@@ -27,3 +27,5 @@ dist-ssr
 backend/.env
 
 src/data/CardData.tsx
+.vercel
+.env*
