@@ -4,10 +4,10 @@ import Footer from "./Footer";
 
 export default function Layout() {
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8f6ff]">
+    <div className="flex min-h-dvh flex-col overflow-x-hidden bg-[#f8f6ff]">
       <Header />
 
-      <main className="flex-1 p-0">
+      <main className="min-w-0 flex-1 p-0">
         <Outlet />
       </main>
 

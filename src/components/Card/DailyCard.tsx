@@ -17,7 +17,7 @@ export default function DailyCard({
     <div className="flex flex-col items-center gap-4">
       <div
         className={[
-          "relative w-[216px] h-[384px] rounded-lg cursor-pointer overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.3)]",
+          "relative aspect-[9/16] w-[clamp(160px,55vw,216px)] rounded-lg cursor-pointer overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.3)]",
           revealed &&
             [
               "after:content-[''] after:absolute after:inset-0",

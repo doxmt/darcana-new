@@ -69,10 +69,31 @@ export default function DailyTarot() {
 
   return (
     <div
-      className="relative w-full min-h-[calc(100vh-112px)] bg-[url('/BackGround1.webp')] bg-cover bg-center bg-no-repeat overflow-hidden"
+      className="relative min-h-[max(760px,calc(100dvh-112px))] w-full overflow-x-hidden overflow-y-auto bg-[url('/BackGround1.webp')] bg-cover bg-center bg-no-repeat"
     >
-      <div className="min-h-[calc(100vh-112px)] flex items-center justify-center px-4">
-        <div className="w-[clamp(160px,18vw,260px)]">
+      <div className="relative z-10 flex min-h-[max(760px,calc(100dvh-112px))] flex-col items-center justify-center gap-6 px-4 py-8 md:block md:p-0">
+        <div className="w-full max-w-md md:absolute md:right-[2%] md:top-[8%] md:w-[min(90vw,420px)] md:max-w-none">
+          <SpeechBubble bubbleId={1}>
+            {selectedCard
+              ? `${selectedCard.id}번 카드인 '${selectedCard.nameKo}' 카드를 ${direction} 방향으로 뽑으셨습니다.`
+              : "카드 뽑기 버튼을 눌러 오늘의 카드를 뽑아보세요"}
+
+            {selectedCard && (
+              <div className="mt-4 flex w-full justify-center">
+                <Button
+                  text="카드 해설 보기"
+                  onClick={() =>
+                    nav(
+                      `/interpret/${selectedCard.id}?rev=${selectedCard.isReversed}`
+                    )
+                  }
+                />
+              </div>
+            )}
+          </SpeechBubble>
+        </div>
+
+        <div className="md:absolute md:left-1/2 md:top-1/2 md:w-[clamp(160px,18vw,260px)] md:-translate-x-1/2 md:-translate-y-1/2">
           <DailyCard
             onDraw={handleDraw}
             image={selectedCard ? getCardImage(selectedCard.id) : cardBehind}
@@ -82,32 +103,12 @@ export default function DailyTarot() {
         </div>
       </div>
 
-      <div className="absolute bottom-0 right-0 ">
+      <div className="pointer-events-none absolute bottom-0 right-0">
         <img
           src={getTarotgirlImage(1)}
           alt=""
-          className="w-[clamp(180px,30vw,420px)] h-auto"
+          className="h-auto w-[clamp(190px,45vw,420px)]"
         />
-      </div>
-      <div className="absolute top-[8%] right-[2%] w-[min(90vw,420px)]">
-        <SpeechBubble bubbleId={1}>
-          {selectedCard
-            ? `${selectedCard.id}번 카드인 '${selectedCard.nameKo}' 카드를 ${direction} 방향으로 뽑으셨습니다.`
-            : "카드 뽑기 버튼을 눌러 오늘의 카드를 뽑아보세요"}
-
-          {selectedCard && (
-            <div className="w-full flex justify-center  mt-4">
-              <Button
-                text="카드 해설 보기"
-                onClick={() =>
-                  nav(
-                    `/interpret/${selectedCard.id}?rev=${selectedCard.isReversed}`
-                  )
-                }
-              />
-            </div>
-          )}
-        </SpeechBubble>
       </div>
     </div>
   );

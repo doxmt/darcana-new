@@ -32,17 +32,19 @@ export default function Draw({ onComplete }: DrawProps) {
   };
 
   return (
-    <div className="flex flex-col items-center w-full h-full py-[2vh]">
+    <div className="flex h-full w-full flex-col items-center py-2 md:py-[2vh]">
       <div
         className="
           flex flex-wrap
           w-full
-          gap-[4px]
-          px-[0.5vw]
-          justify-start
-          overflow-y-auto
-          max-h-[70vh]
-          pr-[6px]
+          max-w-[920px]
+          gap-1
+          px-1
+          justify-center md:justify-start
+          overflow-y-visible md:overflow-y-auto
+          md:max-h-[70dvh]
+          md:px-[0.5vw]
+          md:pr-[6px]
         "
       >
         {Array.from({ length: totalCards }).map((_, idx) => (
@@ -57,7 +59,7 @@ export default function Draw({ onComplete }: DrawProps) {
             className={`
               border-0 bg-transparent p-0
               cursor-pointer transition-all duration-200 select-none
-              w-[9vw] sm:w-[7vw] md:w-[6vw] lg:w-[4.8vw] xl:w-[4vw]
+              w-[clamp(42px,13vw,64px)] sm:w-[clamp(48px,8vw,76px)] md:w-[6vw] lg:w-[4.8vw] xl:w-[4vw]
               ${
                 selectedSlots.includes(idx)
                   ? "opacity-50 scale-90 drop-shadow-[0_0_10px_rgba(200,200,255,0.7)]"
@@ -70,12 +72,12 @@ export default function Draw({ onComplete }: DrawProps) {
         ))}
       </div>
 
-      <p className="text-white text-lg mt-[2vh] tracking-wide">
+      <p className="mt-4 text-lg tracking-wide text-white md:mt-[2vh]">
         {selectedSlots.length} / 3 선택됨
       </p>
 
       {selectedSlots.length === 3 && (
-        <div className="mt-[1vh]">
+        <div className="mt-3 md:mt-[1vh]">
           <Button text="결과 보기" onClick={handleComplete} />
         </div>
       )}

@@ -48,20 +48,20 @@ const isTarotResponse = (value: unknown): value is TarotResponse => {
 
 function SelectedCards({ cards }: { cards: DrawResult[] }) {
   return (
-    <div className="flex gap-[3vw] justify-center mb-[3vh]">
+    <div className="mb-5 flex flex-wrap justify-center gap-3 sm:gap-5 md:mb-[3vh] md:gap-[3vw]">
       {cards.map((card) => (
         <div key={card.id} className="flex flex-col items-center gap-[1vh]">
           <img
             src={getCardImage(card.id)}
             alt={`${card.nameKo} 카드`}
             className={`
-            w-[clamp(90px,9vw,160px)]
+            w-[clamp(72px,24vw,150px)] md:w-[clamp(90px,9vw,160px)]
             transition-transform duration-300
             ${card.isReversed ? "rotate-180" : ""}
             drop-shadow-[0_0_20px_rgba(180,200,255,0.6)]
           `}
           />
-          <div className="text-[clamp(11px,1.2vw,14px)] text-indigo-100 opacity-90">
+          <div className="text-center text-[clamp(11px,1.2vw,14px)] text-indigo-100 opacity-90">
             {card.nameKo} · {card.isReversed ? "역방향" : "정방향"}
           </div>
         </div>
@@ -77,7 +77,7 @@ function SingleCard({ card }: { card: DrawResult }) {
         src={getCardImage(card.id)}
         alt={`${card.nameKo} 카드`}
         className={`
-        w-[clamp(110px,10vw,180px)]
+        w-[clamp(96px,34vw,170px)] md:w-[clamp(110px,10vw,180px)]
         transition-transform duration-300
         ${card.isReversed ? "rotate-180" : ""}
         drop-shadow-[0_0_25px_rgba(180,200,255,0.65)]
@@ -136,7 +136,7 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
 
   if (loading) {
     return (
-      <div className="text-white text-xl animate-pulse">
+      <div className="px-4 text-center text-lg text-white animate-pulse sm:text-xl">
         🔮 해석을 불러오는 중입니다… 잠시만 기다려주세요…
       </div>
     );
@@ -144,9 +144,9 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
 
   if (error || !result) {
     return (
-      <div className="flex flex-col items-center gap-4 text-white">
-        <p className="text-xl">해석을 불러오지 못했습니다.</p>
-        <div className="flex gap-3">
+      <div className="flex flex-col items-center gap-4 px-4 text-center text-white">
+        <p className="text-lg sm:text-xl">해석을 불러오지 못했습니다.</p>
+        <div className="flex flex-wrap justify-center gap-3">
           <Button text="다시 시도" onClick={() => setRetryCount((c) => c + 1)} />
           <Button text="처음으로" onClick={onRestart} />
         </div>
@@ -155,14 +155,14 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
   }
 
   const renderButtons = (nextStep?: number) => (
-    <div className="mt-6 flex gap-3 justify-center">
+    <div className="mt-6 flex flex-wrap justify-center gap-3">
       {step > 1 && <Button text="이전으로" onClick={() => setStep(step - 1)} />}
       {nextStep && <Button text="다음으로" onClick={() => setStep(nextStep)} />}
     </div>
   );
 
   return (
-    <div className="text-white w-full h-full flex flex-col items-center px-[4vw] py-[3vh]">
+    <div className="flex h-full w-full flex-col items-center overflow-y-visible px-0 py-2 text-white md:overflow-y-auto md:px-[4vw] md:py-[3vh]">
       {step === 1 && (
         <SpeechBubble bubbleId={3}>
           <SelectedCards cards={cards} />
@@ -195,7 +195,7 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
 
           <div className="text-white whitespace-pre-line">{result.summary}</div>
 
-          <div className="mt-8 flex gap-3 justify-center">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button text="이전으로" onClick={() => setStep(4)} />
             <Button text="다시 하기" onClick={onRestart} />
           </div>

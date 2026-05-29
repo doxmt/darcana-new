@@ -20,14 +20,15 @@ export default function SpeechBubble({
     <div
       className={`
         relative 
-        p-6 
+        p-4
+        sm:p-6
         rounded-2xl 
         shadow-md
         border
         ${bubbleStyle}
       `}
     >
-      <div className="text-gray-800 leading-relaxed whitespace-pre-line text-center">
+      <div className="text-center text-sm leading-relaxed text-gray-800 whitespace-pre-line sm:text-base">
         {children}
       </div>
     </div>
