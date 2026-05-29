@@ -8,23 +8,51 @@ import cardBehind from "../assets/cards/CardBehind.webp";
 import Button from "../components/Button";
 import { useNavigate } from "react-router-dom";
 
+const getLocalDateKey = () => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `daily-tarot-${year}-${month}-${day}`;
+};
+
+const readSavedDailyCard = (key: string): DrawResult | null => {
+  try {
+    const saved = localStorage.getItem(key);
+    if (!saved) return null;
+
+    const parsed = JSON.parse(saved) as Partial<DrawResult>;
+    if (
+      typeof parsed.id !== "number" ||
+      typeof parsed.nameKo !== "string" ||
+      typeof parsed.isReversed !== "boolean"
+    ) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return parsed as DrawResult;
+  } catch {
+    localStorage.removeItem(key);
+    return null;
+  }
+};
+
 export default function DailyTarot() {
   const nav = useNavigate();
-  const [todayKey] = useState(
-    () => `daily-tarot-${new Date().toISOString().slice(0, 10)}`
-  );
+  const [todayKey] = useState(getLocalDateKey);
   const [{ selectedCard, revealed }, setDailyTarot] = useState<{
     selectedCard: DrawResult | null;
     revealed: boolean;
   }>(() => {
-    const saved = localStorage.getItem(todayKey);
-
+    const saved = readSavedDailyCard(todayKey);
     if (!saved) {
       return { selectedCard: null, revealed: false };
     }
 
     return {
-      selectedCard: JSON.parse(saved) as DrawResult,
+      selectedCard: saved,
       revealed: true,
     };
   });
@@ -41,10 +69,10 @@ export default function DailyTarot() {
 
   return (
     <div
-      className="relative w-screen h-screen bg-[url('/BackGround1.webp')] bg-cover bg-center bg-no-repeat"
+      className="relative w-full min-h-[calc(100vh-112px)] bg-[url('/BackGround1.webp')] bg-cover bg-center bg-no-repeat overflow-hidden"
     >
-      <div className="w-screen h-screen flex items-center justify-center">
-        <div className="w-[18vw]">
+      <div className="min-h-[calc(100vh-112px)] flex items-center justify-center px-4">
+        <div className="w-[clamp(160px,18vw,260px)]">
           <DailyCard
             onDraw={handleDraw}
             image={selectedCard ? getCardImage(selectedCard.id) : cardBehind}
@@ -55,9 +83,13 @@ export default function DailyTarot() {
       </div>
 
       <div className="absolute bottom-0 right-0 ">
-        <img src={getTarotgirlImage(1)} className="w-[30vw] h-auto" />
+        <img
+          src={getTarotgirlImage(1)}
+          alt=""
+          className="w-[clamp(180px,30vw,420px)] h-auto"
+        />
       </div>
-      <div className="absolute top-[10%] right-[2%] w-[30vw] h-[22vh]">
+      <div className="absolute top-[8%] right-[2%] w-[min(90vw,420px)]">
         <SpeechBubble bubbleId={1}>
           {selectedCard
             ? `${selectedCard.id}번 카드인 '${selectedCard.nameKo}' 카드를 ${direction} 방향으로 뽑으셨습니다.`

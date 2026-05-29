@@ -21,6 +21,31 @@ type TarotResponse = {
   summary: string;
 };
 
+const getApiBase = () => {
+  const value = import.meta.env.VITE_TAROT_API_URL?.trim();
+  if (!value) return "";
+
+  return value.replace(/\/+$/, "");
+};
+
+const isTarotResponse = (value: unknown): value is TarotResponse => {
+  if (!value || typeof value !== "object") return false;
+
+  const candidate = value as Partial<TarotResponse>;
+  return (
+    typeof candidate.intro === "string" &&
+    typeof candidate.summary === "string" &&
+    Array.isArray(candidate.cards) &&
+    candidate.cards.length === 3 &&
+    candidate.cards.every(
+      (card) =>
+        card &&
+        typeof card.title === "string" &&
+        typeof card.description === "string"
+    )
+  );
+};
+
 function SelectedCards({ cards }: { cards: DrawResult[] }) {
   return (
     <div className="flex gap-[3vw] justify-center mb-[3vh]">
@@ -28,6 +53,7 @@ function SelectedCards({ cards }: { cards: DrawResult[] }) {
         <div key={card.id} className="flex flex-col items-center gap-[1vh]">
           <img
             src={getCardImage(card.id)}
+            alt={`${card.nameKo} 카드`}
             className={`
             w-[clamp(90px,9vw,160px)]
             transition-transform duration-300
@@ -49,6 +75,7 @@ function SingleCard({ card }: { card: DrawResult }) {
     <div className="flex flex-col items-center mb-[2.5vh]">
       <img
         src={getCardImage(card.id)}
+        alt={`${card.nameKo} 카드`}
         className={`
         w-[clamp(110px,10vw,180px)]
         transition-transform duration-300
@@ -69,31 +96,43 @@ export default function Result({ theme, cards, onRestart }: ResultProps) {
   const [error, setError] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [result, setResult] = useState<TarotResponse | null>(null);
-  const API_BASE = import.meta.env.VITE_TAROT_API_URL;
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchTarot = async () => {
       try {
         setLoading(true);
         setError(false);
-        const res = await fetch(`${API_BASE}/theme-tarot`, {
+        setResult(null);
+        const apiBase = getApiBase();
+        const res = await fetch(`${apiBase}/theme-tarot`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ theme, cards }),
+          signal: controller.signal,
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+        if (!isTarotResponse(data)) {
+          throw new Error("Invalid tarot response");
+        }
         setResult(data);
       } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") return;
         console.error("API 호출 실패:", err);
         setError(true);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchTarot();
-  }, [theme, cards, API_BASE, retryCount]);
+
+    return () => controller.abort();
+  }, [theme, cards, retryCount]);
 
   if (loading) {
     return (

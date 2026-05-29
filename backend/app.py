@@ -1,17 +1,23 @@
 # app.py
+import logging
+import os
+import json
+
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from openai import OpenAI
-import json
-import os
 
 
 app = Flask(__name__)
-CORS(app)
+logging.basicConfig(level=logging.INFO)
 
+allowed_origins = os.environ.get("CORS_ORIGINS", "*")
+CORS(app, resources={r"/*": {"origins": allowed_origins.split(",")}})
 
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+client = OpenAI(api_key=OPENAI_API_KEY) if OPENAI_API_KEY else None
 
-client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+MAX_THEME_LENGTH = 120
 
 def safe_json_parse(text: str):
     text = text.strip()
@@ -48,6 +54,73 @@ def format_card_detail(c):
     }
 
 
+def validate_request_payload(data):
+    if not isinstance(data, dict):
+        return None, "JSON 본문이 필요합니다"
+
+    theme = data.get("theme")
+    cards = data.get("cards")
+
+    if not isinstance(theme, str) or not theme.strip():
+        return None, "주제를 입력해주세요"
+
+    theme = theme.strip()
+    if len(theme) > MAX_THEME_LENGTH:
+        return None, f"주제는 {MAX_THEME_LENGTH}자 이하로 입력해주세요"
+
+    if not isinstance(cards, list) or len(cards) != 3:
+        return None, "카드는 정확히 3장을 선택해주세요"
+
+    normalized_cards = []
+    seen_ids = set()
+    for card in cards:
+        if not isinstance(card, dict):
+            return None, "카드 정보가 올바르지 않습니다"
+
+        card_id = card.get("id")
+        name = card.get("nameKo")
+        is_reversed = card.get("isReversed")
+
+        if not isinstance(card_id, int) or not 0 <= card_id <= 77:
+            return None, "카드 번호가 올바르지 않습니다"
+        if card_id in seen_ids:
+            return None, "중복된 카드는 선택할 수 없습니다"
+        if not isinstance(name, str) or not name.strip():
+            return None, "카드 이름이 올바르지 않습니다"
+        if not isinstance(is_reversed, bool):
+            return None, "카드 방향이 올바르지 않습니다"
+
+        seen_ids.add(card_id)
+        normalized_cards.append(
+            {
+                "id": card_id,
+                "nameKo": name.strip(),
+                "isReversed": is_reversed,
+            }
+        )
+
+    return {"theme": theme, "cards": normalized_cards}, None
+
+
+def validate_tarot_result(result):
+    if not isinstance(result, dict):
+        return False
+    if not isinstance(result.get("intro"), str):
+        return False
+    if not isinstance(result.get("summary"), str):
+        return False
+
+    cards = result.get("cards")
+    if not isinstance(cards, list) or len(cards) != 3:
+        return False
+
+    return all(
+        isinstance(card, dict)
+        and isinstance(card.get("title"), str)
+        and isinstance(card.get("description"), str)
+        for card in cards
+    )
+
 
 # =============================
 # 헬스체크
@@ -62,14 +135,18 @@ def health():
 # =============================
 @app.route("/theme-tarot", methods=["POST"])
 def theme_tarot():
-    data = request.get_json()
+    if client is None:
+        app.logger.error("OPENAI_API_KEY is not configured")
+        return jsonify({"error": "서버 설정 오류"}), 503
 
-    theme = data.get("theme")
-    cards = data.get("cards", [])
-    
+    data = request.get_json(silent=True)
+    payload, validation_error = validate_request_payload(data)
 
-    if not theme or len(cards) != 3:
-        return jsonify({"error": "잘못된 입력"}), 400
+    if validation_error:
+        return jsonify({"error": validation_error}), 400
+
+    theme = payload["theme"]
+    cards = payload["cards"]
 
     cards_line = format_cards_line(cards)
     card_details = [format_card_detail(c) for c in cards]
@@ -124,15 +201,19 @@ def theme_tarot():
                 {"role": "user", "content": prompt},
             ],
             temperature=0.8,
+            response_format={"type": "json_object"},
         )
 
         content = res.choices[0].message.content
         result = safe_json_parse(content)
+        if not validate_tarot_result(result):
+            app.logger.error("Invalid tarot response shape: %s", result)
+            return jsonify({"error": "타로 해석 응답 형식 오류"}), 502
 
         return jsonify(result)
 
     except Exception as e:
-        print("❌ Tarot API Error:", e)
+        app.logger.exception("Tarot API Error: %s", e)
         return jsonify({"error": "타로 해석 실패"}), 500
 
 if __name__ == "__main__":

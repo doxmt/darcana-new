@@ -46,11 +46,16 @@ export default function Draw({ onComplete }: DrawProps) {
         "
       >
         {Array.from({ length: totalCards }).map((_, idx) => (
-          <img
+          <button
             key={idx}
-            src={cardBehind}
+            type="button"
             onClick={() => toggleSlot(idx)}
+            aria-pressed={selectedSlots.includes(idx)}
+            aria-label={`${idx + 1}번째 카드 ${
+              selectedSlots.includes(idx) ? "선택 해제" : "선택"
+            }`}
             className={`
+              border-0 bg-transparent p-0
               cursor-pointer transition-all duration-200 select-none
               w-[9vw] sm:w-[7vw] md:w-[6vw] lg:w-[4.8vw] xl:w-[4vw]
               ${
@@ -59,7 +64,9 @@ export default function Draw({ onComplete }: DrawProps) {
                   : "hover:scale-105"
               }
             `}
-          />
+          >
+            <img src={cardBehind} alt="" className="w-full" draggable={false} />
+          </button>
         ))}
       </div>
 

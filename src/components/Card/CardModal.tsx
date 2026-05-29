@@ -15,7 +15,12 @@ export default function CardModal({ isOpen, onClose, card }: CardModalProps) {
   if (!isOpen || !card) return null;
 
   return (
-    <div className="fixed inset-0 w-full h-full z-[1000] flex items-center justify-center">
+    <div
+      className="fixed inset-0 w-full h-full z-[1000] flex items-center justify-center"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="card-modal-title"
+    >
       <div
         className="absolute inset-0 bg-black/60"
         onClick={() => {
@@ -35,10 +40,12 @@ export default function CardModal({ isOpen, onClose, card }: CardModalProps) {
         "
       >
         <button
+          type="button"
           onClick={() => {
             setIsReversed(false);
             onClose();
           }}
+          aria-label="닫기"
           className="absolute top-3 right-4 text-2xl text-gray-600 hover:text-black transition"
         >
           ×
@@ -52,7 +59,7 @@ export default function CardModal({ isOpen, onClose, card }: CardModalProps) {
                 w-full max-w-[260px] rounded-lg object-cover transition-transform
                 ${isReversed ? "rotate-180" : ""}
               `}
-              alt="카드 이미지"
+              alt={`${card.nameKo} 카드`}
             />
           </div>
 
@@ -71,7 +78,10 @@ export default function CardModal({ isOpen, onClose, card }: CardModalProps) {
             </div>
 
             <div>
-              <h1 className="text-2xl font-bold text-purple-700">
+              <h1
+                id="card-modal-title"
+                className="text-2xl font-bold text-purple-700"
+              >
                 {card.id}. {card.nameKo} ({card.nameEn})
               </h1>
             </div>
