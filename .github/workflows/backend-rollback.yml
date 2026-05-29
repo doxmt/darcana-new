@@ -1,0 +1,52 @@
+name: Backend Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: "롤백할 Cloud Run revision 이름 (예: tarot-api-00003-abc)"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  rollback:
+    name: Rollback to revision
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      GCP_REGION: ${{ vars.GCP_REGION }}
+      CLOUD_RUN_SERVICE: ${{ vars.CLOUD_RUN_SERVICE }}
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Validate environment
+        run: |
+          test -n "$GCP_PROJECT_ID"
+          test -n "$GCP_REGION"
+          test -n "$CLOUD_RUN_SERVICE"
+
+      - name: Rollback traffic to revision
+        run: |
+          gcloud run services update-traffic "$CLOUD_RUN_SERVICE" \
+            --to-revisions="${{ inputs.revision }}=100" \
+            --project "$GCP_PROJECT_ID" \
+            --region "$GCP_REGION"
+
+      - name: Verify rollback
+        run: |
+          gcloud run services describe "$CLOUD_RUN_SERVICE" \
+            --project "$GCP_PROJECT_ID" \
+            --region "$GCP_REGION" \
+            --format="value(status.traffic[0].revisionName,status.traffic[0].percent)"
