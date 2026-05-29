@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   project-check:
-    name: Lint and build
+    name: Lint, test, and build
     runs-on: ubuntu-latest
     env:
       VITE_TAROT_API_URL: ${{ secrets.VITE_TAROT_API_URL }}
