@@ -33,7 +33,7 @@ export default function DailyCard({
       >
         <img
           src={image}
-          alt="타로 카드"
+          alt={revealed ? "뽑은 타로 카드" : "뒤집힌 타로 카드"}
           className={[
             "w-full h-full object-cover rounded-[inherit]",
             revealed && "absolute [animation:revealScan_3s_ease_forwards] opacity-0",
@@ -44,7 +44,7 @@ export default function DailyCard({
         />
       </div>
 
-      <Button onClick={onDraw} text="카드 뽑기" />
+      <Button onClick={onDraw} text={revealed ? "오늘의 카드 완료" : "카드 뽑기"} disabled={revealed} />
     </div>
   );
 }
