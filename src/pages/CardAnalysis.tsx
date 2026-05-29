@@ -32,10 +32,7 @@ export default function CardAnalysis() {
 
   return (
     <div
-      className="absolute w-full flex flex-col items-center bg-[#1a1026] min-h-screen"
-      style={{
-        background: "linear-gradient(160deg, #232526 0%, #414345 100%)",
-      }}
+      className="absolute w-full flex flex-col items-center bg-[linear-gradient(160deg,#232526_0%,#414345_100%)] min-h-screen"
     >
       <div className="flex flex-row items-center justify-center w-[40%] mt-15">
         <img src={TarotCardIcon} className="w-[5%] mr-2" />

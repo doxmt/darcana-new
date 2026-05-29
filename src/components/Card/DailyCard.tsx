@@ -33,6 +33,7 @@ export default function DailyCard({
       >
         <img
           src={image}
+          alt="타로 카드"
           className={[
             "w-full h-full object-cover rounded-[inherit]",
             revealed && "absolute [animation:revealScan_3s_ease_forwards] opacity-0",

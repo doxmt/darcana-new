@@ -23,8 +23,7 @@ export default function SpeechBubble({
         p-6 
         rounded-2xl 
         shadow-md
-        border 
-        SpeechBubble
+        border
         ${bubbleStyle}
       `}
     >
