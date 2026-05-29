@@ -12,17 +12,17 @@ export default function Theme({ onSubmit }: ThemeProps) {
     <div
       className="
         flex flex-col items-center text-center
-        w-[45vw] max-w-[720px] min-w-[260px]
-        min-h-[38vh]
+        w-full max-w-[720px] min-w-0
+        md:w-[45vw] md:min-h-[38vh]
         bg-gradient-to-b from-black/50 via-indigo-900/30 to-indigo-800/20
         backdrop-blur-xl
-        px-[4vw] py-[5vh]
-        rounded-3xl
+        px-5 py-8 sm:px-8 sm:py-10 md:px-[4vw] md:py-[5vh]
+        rounded-2xl sm:rounded-3xl
         border border-indigo-300/30
         shadow-[0_0_40px_rgba(120,150,255,0.35)]
         animate-fadeIn
-        translate-x-[-20%]
-        translate-y-[-25%]
+        md:translate-x-[-20%]
+        md:translate-y-[-25%]
       "
     >
       <h2
@@ -39,7 +39,7 @@ export default function Theme({ onSubmit }: ThemeProps) {
         value={value}
         onChange={(e) => setValue(e.target.value)}
         className="
-          w-[42vw] max-w-[520px] min-w-[220px]
+          w-full max-w-[520px] min-w-0
           p-[clamp(10px,1.2vw,18px)]
           rounded-xl bg-black/40 text-indigo-100
           placeholder-indigo-300/60
